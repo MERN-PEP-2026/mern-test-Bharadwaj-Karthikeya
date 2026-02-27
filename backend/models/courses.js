@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
 const courseSchema = new mongoose.Schema({
-    name: {
+    courseName: {
         type: String,
         required: true,
     },
-    description: {
+    courseDescription: {
         type: String,
         required: true,
     },
