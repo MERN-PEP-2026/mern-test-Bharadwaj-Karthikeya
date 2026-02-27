@@ -46,3 +46,44 @@ export const login = async ({ email, password }) => {
     throw error;
   }
 };
+
+
+export const getUserProfile = async (userId) => {
+  try {
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUserProfile = async ({ userId, updateData }) => {
+  try {
+    if (updateData.password) {
+        updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true },
+    ).select("-password");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    await User.findByIdAndDelete(userId);
+    return { message: "User deleted successfully" };
+  } catch (error) {
+    throw error;
+  }
+};
