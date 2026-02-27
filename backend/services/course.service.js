@@ -22,7 +22,7 @@ export const createCourse = async ({ user, body }) => {
 
 export const getAllCourses = async () => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find().populate("instructor", "name email");
     return courses;
   } catch (error) {
     throw error;
@@ -56,7 +56,7 @@ export const updateCourse = async ({ courseId, updateData }) => {
 
 export const getCourseDetails = async ({ courseId }) => {
   try {
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId).populate("instructor", "name email");
     if (!course) {
       throw new Error("Course not found");
     }
