@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import Navbar from "../components/Navbar";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -10,9 +11,12 @@ import ProtectedRoute from "./ProtectedRoute";
 
 export const AppRoutes = () => {
   const { user } = useContext(AuthContext);
+  const { darkMode } = useContext(ThemeContext);
 
   return (
-    <div className="min-h-screen bg-slate-950/80 text-slate-50">
+    <div
+      className={`min-h-screen bg-transparent ${darkMode ? "text-slate-100" : "text-slate-900"}`}
+    >
       <Navbar />
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-10">
         <Routes>
@@ -39,3 +43,5 @@ export const AppRoutes = () => {
     </div>
   );
 };
+
+export default AppRoutes;

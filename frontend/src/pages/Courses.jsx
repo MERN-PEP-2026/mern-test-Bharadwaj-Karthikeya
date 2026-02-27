@@ -1,22 +1,27 @@
-import { useEffect, useState, useContext } from "react";
-import { getCourses, createCourse, deleteCourse } from "../api/course.api";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext";
 import CourseCard from "../components/CourseCard";
 import CourseFormModal from "../components/CourseFormModal";
+import { getCourses, createCourse, deleteCourse } from "../api/course.api";
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const { darkMode } = useContext(ThemeContext);
+  const [courses, setCourses] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const role = user?.role ?? "student";
+  const isAdminOrInstructor = role === "admin" || role === "instructor";
+  const userId = user?._id ?? user?.id;
+
+  const myCourses = useMemo(() => {
+    if (!userId) return [];
+    return courses.filter((c) => c.instructor === userId);
+  }, [courses, userId]);
 
   const fetchCourses = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await getCourses();
-      setCourses(data);
-    } finally {
-      setIsLoading(false);
-    }
+    const { data } = await getCourses();
+    setCourses(data);
   };
 
   useEffect(() => {
@@ -25,6 +30,7 @@ const Courses = () => {
 
   const handleCreate = async (form) => {
     await createCourse(form);
+    setShowModal(false);
     fetchCourses();
   };
 
@@ -33,71 +39,88 @@ const Courses = () => {
     fetchCourses();
   };
 
-  const canManageCourses = user.role === "admin" || user.role === "instructor";
-  const totalCourses = courses.length;
-  const highlightCourse = courses[0]?.courseName ?? "Launch your first course";
+  const stats = [
+    { label: "Total courses", value: courses.length },
+    { label: "My courses", value: myCourses.length },
+    { label: "Role", value: role },
+  ];
 
   return (
     <section className="space-y-10">
-      <header className="flex flex-wrap items-center justify-between gap-6">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
-            Dashboard
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p
+            className={`text-sm font-semibold uppercase tracking-[0.2em] ${
+              darkMode ? "text-slate-400" : "text-slate-500"
+            }`}
+          >
+            Catalog
           </p>
-          <h1 className="text-3xl font-semibold text-white">Learning operations</h1>
-          <p className="text-sm text-slate-400">
-            Monitor cohorts, curate courses, and keep momentum across your team.
-          </p>
+          <h1 className={`text-3xl font-semibold ${darkMode ? "text-white" : "text-slate-900"}`}>
+            Courses
+          </h1>
         </div>
-        {canManageCourses && <CourseFormModal onCreate={handleCreate} />}
+        {isAdminOrInstructor && (
+          <button
+            onClick={() => setShowModal(true)}
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold ${
+              darkMode ? "bg-white text-slate-900" : "bg-slate-900 text-white hover:bg-slate-800"
+            }`}
+          >
+            New course
+          </button>
+        )}
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="glass-panel p-6">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Total courses</p>
-          <p className="mt-3 text-4xl font-semibold text-white">{totalCourses}</p>
-          <p className="text-sm text-slate-400">Across every learning stream</p>
-        </div>
-        <div className="glass-panel p-6">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Highlight</p>
-          <p className="mt-3 text-xl font-semibold text-white">{highlightCourse}</p>
-          <p className="text-sm text-slate-400">Most recent addition</p>
-        </div>
-        <div className="glass-panel p-6">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Role scope</p>
-          <p className="mt-3 text-xl font-semibold capitalize text-white">{user.role}</p>
-          <p className="text-sm text-slate-400">Controls tailored to your access</p>
-        </div>
+        {stats.map((stat) => (
+          <div key={stat.label} className="surface-card p-6">
+            <p
+              className={`text-xs uppercase tracking-[0.3em] ${
+                darkMode ? "text-slate-400" : "text-slate-500"
+              }`}
+            >
+              {stat.label}
+            </p>
+            <p className={`mt-3 text-3xl font-semibold capitalize ${darkMode ? "text-white" : "text-slate-900"}`}>
+              {stat.value || 0}
+            </p>
+          </div>
+        ))}
       </div>
 
-      {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="glass-panel h-48 animate-pulse" />
-          ))}
-        </div>
-      ) : courses.length ? (
-        <div className="grid gap-4 md:grid-cols-2">
+      {courses.length ? (
+        <div className="grid gap-6 md:grid-cols-2">
           {courses.map((course) => (
             <CourseCard
               key={course._id}
               course={course}
               onDelete={handleDelete}
-              isEditable={canManageCourses}
+              canEdit={isAdminOrInstructor}
             />
           ))}
         </div>
       ) : (
-        <div className="glass-panel flex flex-col items-center gap-4 p-12 text-center">
-          <p className="text-lg font-semibold text-white">No courses yet</p>
-          <p className="text-sm text-slate-400">
-            When you publish a course, it will appear here with key metadata and quick actions.
-          </p>
-          {canManageCourses && (
-            <CourseFormModal onCreate={handleCreate} />
-          )}
+        <div className={`surface-card p-12 text-center ${darkMode ? "text-slate-300" : "text-slate-500"}`}>
+          <p className={`text-lg font-semibold ${darkMode ? "text-white" : "text-slate-900"}`}>No courses yet</p>
+          <p className="mt-2">Create your first curriculum to see it appear here.</p>
         </div>
       )}
+
+      {isAdminOrInstructor && myCourses.length > 0 && (
+        <div className="space-y-4">
+          <h2 className={`text-xl font-semibold ${darkMode ? "text-white" : "text-slate-900"}`}>
+            My Courses
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {myCourses.map((course) => (
+              <CourseCard key={course._id} course={course} onDelete={handleDelete} canEdit />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showModal && <CourseFormModal onSubmit={handleCreate} close={() => setShowModal(false)} />}
     </section>
   );
 };

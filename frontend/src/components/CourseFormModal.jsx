@@ -1,102 +1,114 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 
-const defaultForm = {
-  courseName: "",
-  courseDescription: "",
-};
+const CourseFormModal = ({ initialData, onSubmit, close }) => {
+  const [form, setForm] = useState({
+    courseName: "",
+    courseDescription: "",
+  });
+  const { darkMode } = useContext(ThemeContext);
 
-const CourseFormModal = ({ onCreate }) => {
-  const [form, setForm] = useState(defaultForm);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.courseName.trim()) return;
-    setIsSubmitting(true);
-    try {
-      await onCreate(form);
-      setForm(defaultForm);
-      setIsOpen(false);
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+    } else {
+      setForm({ courseName: "", courseDescription: "" });
     }
+  }, [initialData]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(form);
   };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="rounded-full bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:shadow-indigo-500/40"
-      >
-        New course
-      </button>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center px-4 py-10 ${
+        darkMode ? "bg-slate-900/60" : "bg-slate-900/40"
+      }`}
+    >
+      <div className="surface-card w-full max-w-lg p-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className={`text-xl font-semibold ${darkMode ? "text-white" : "text-slate-900"}`}>
+            {initialData ? "Edit course" : "Create course"}
+          </h2>
+          <button
+            type="button"
+            onClick={close}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+              darkMode
+                ? "border-slate-700 text-slate-300"
+                : "border-slate-300 text-slate-600"
+            }`}
+          >
+            Close
+          </button>
+        </div>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-10">
-          <div className="glass-panel relative w-full max-w-xl p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <label
+            className={`block text-sm font-medium ${darkMode ? "text-slate-200" : "text-slate-600"}`}
+          >
+            Course name
+            <input
+              className={`mt-2 w-full rounded-xl border px-4 py-3 text-base placeholder:text-slate-400 focus:border-slate-900 focus:outline-none ${
+                darkMode
+                  ? "border-slate-700 bg-slate-900 text-white placeholder:text-slate-500"
+                  : "border-slate-200 bg-white text-slate-900"
+              }`}
+              placeholder="Product Strategy Foundations"
+              value={form.courseName}
+              onChange={(e) => setForm({ ...form, courseName: e.target.value })}
+              required
+            />
+          </label>
+
+          <label
+            className={`block text-sm font-medium ${darkMode ? "text-slate-200" : "text-slate-600"}`}
+          >
+            Description
+            <textarea
+              rows={4}
+              className={`mt-2 w-full rounded-xl border px-4 py-3 text-base placeholder:text-slate-400 focus:border-slate-900 focus:outline-none ${
+                darkMode
+                  ? "border-slate-700 bg-slate-900 text-white placeholder:text-slate-500"
+                  : "border-slate-200 bg-white text-slate-900"
+              }`}
+              placeholder="Share what learners can expect"
+              value={form.courseDescription}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  courseDescription: e.target.value,
+                })
+              }
+              required
+            />
+          </label>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              className={`rounded-xl px-5 py-3 text-sm font-semibold ${
+                darkMode ? "bg-white text-slate-900" : "bg-slate-900 text-white hover:bg-slate-800"
+              }`}
+            >
+              {initialData ? "Update course" : "Create course"}
+            </button>
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
-              className="absolute right-4 top-4 rounded-full border border-white/15 px-3 py-1 text-xs font-semibold text-slate-200"
+              onClick={close}
+              className={`rounded-xl border px-5 py-3 text-sm font-semibold ${
+                darkMode
+                  ? "border-slate-700 text-slate-200"
+                  : "border-slate-300 text-slate-700"
+              }`}
             >
-              Close
+              Cancel
             </button>
-            <div className="mb-6 space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
-                Create course
-              </p>
-              <h3 className="text-2xl font-semibold text-white">Bring a new cohort to life</h3>
-              <p className="text-sm text-slate-400">
-                Draft a title and a concise description. You can enrich the syllabus later on.
-              </p>
-            </div>
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              <label className="block text-sm font-semibold text-slate-200">
-                Course name
-                <input
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
-                  placeholder="Product Strategy Foundations"
-                  value={form.courseName}
-                  onChange={(e) => setForm((prev) => ({ ...prev, courseName: e.target.value }))}
-                  required
-                />
-              </label>
-
-              <label className="block text-sm font-semibold text-slate-200">
-                Description
-                <textarea
-                  rows={4}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
-                  placeholder="Outline the outcomes, modules, or live touchpoints learners can expect."
-                  value={form.courseDescription}
-                  onChange={(e) => setForm((prev) => ({ ...prev, courseDescription: e.target.value }))}
-                  required
-                />
-              </label>
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rounded-2xl bg-gradient-to-r from-emerald-400 via-sky-500 to-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-emerald-500/30 disabled:opacity-60"
-                >
-                  {isSubmitting ? "Publishing..." : "Publish course"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-2xl border border-white/15 px-6 py-3 text-sm font-semibold text-slate-100"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
-    </>
+        </form>
+      </div>
+    </div>
   );
 };
 
