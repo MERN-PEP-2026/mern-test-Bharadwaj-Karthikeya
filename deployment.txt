@@ -1,7 +1,19 @@
 Frontend URL (live):
 
-https://mern-test-bharadwaj-karthikeya.vercel.app/
+https://mern-test-bharadwaj-karthikeya.vercel.app
 
 Backend URL (live):
 
 https://mern-test-bharadwaj-karthikeya.onrender.com/api
+
+final deployment complete 
+
+credentials for demo 
+
+admin 
+john.doe@example.com  passkey123
+
+instructor
+jane.k@example.com passkey123
+
+or create your own account as any available roles
