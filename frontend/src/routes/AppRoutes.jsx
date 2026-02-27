@@ -18,7 +18,7 @@ export const AppRoutes = () => {
       className={`min-h-screen bg-transparent ${darkMode ? "text-slate-100" : "text-slate-900"}`}
     >
       <Navbar />
-      <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-10">
+      <main className="mx-auto w-full max-w-7xl px-6 pb-16 pt-10">
         <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />

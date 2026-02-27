@@ -25,17 +25,16 @@ const Navbar = () => {
     <header
       className={`sticky top-0 z-40 border-b backdrop-blur ${darkMode ? "border-slate-800 bg-slate-900/85" : "border-slate-200 bg-white/90"}`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 text-4xl">
         <Link
           to="/"
-          className={`text-lg font-semibold tracking-tight ${darkMode ? "text-white" : "text-slate-900"}`}
+          className={`text-lg font-semibold tracking-tight mr-10 ${darkMode ? "text-white" : "text-slate-900"}`}
         >
           LearnXpert
         </Link>
 
-        <div className="flex items-center gap-3">
           {user && (
-            <nav className="hidden gap-2 md:flex">
+            <nav className={`hidden  p-2 rounded-full gap-2 md:flex items-center justify-center ${darkMode ? "bg-slate-800" : "bg-slate-200"}`}>
               <NavLink to="/courses" className={linkClass}>
                 Courses
               </NavLink>
@@ -44,6 +43,7 @@ const Navbar = () => {
               </NavLink>
             </nav>
           )}
+        <div className="flex items-center gap-3">
 
           {!user ? (
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -66,7 +66,7 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <span className={`text-sm font-medium ${darkMode ? "text-slate-300" : "text-slate-500"}`}>{user.name}</span>
+              {/* <span className={`text-sm font-medium ${darkMode ? "text-slate-300" : "text-slate-500"}`}>{user.name}</span> */}
               <button
                 onClick={logout}
                 className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${
