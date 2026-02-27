@@ -11,10 +11,17 @@ const app = express();
 
 connectDB();
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
+app.use(
+  cors({
+    origin: [
+      "https://mern-test-bharadwaj-karthikeya.vercel.app/",
+      process.env.FRONTEND_URL,
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
-} ));
+  }),
+);
 app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
