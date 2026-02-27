@@ -5,3 +5,5 @@ https://mern-test-bharadwaj-karthikeya.vercel.app/
 Backend URL (live):
 
 https://mern-test-bharadwaj-karthikeya.onrender.com/api
+
+Both are Deployed and working
