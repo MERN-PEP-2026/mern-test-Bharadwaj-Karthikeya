@@ -29,8 +29,8 @@ npm run dev
 Configure the environment variables described in the respective READMEs before running `npm start` / `npm run dev`.
 
 ## Deployment
-- Frontend (live): _add URL_
-- Backend (live): _add URL_
+- Frontend (live): [Vercel site](https://mern-test-bharadwaj-karthikeya.vercel.app)
+- Backend (live): [Render service](https://mern-test-bharadwaj-karthikeya.onrender.com/api)
 
 Record the actual production endpoints inside `deployment.txt` (see template committed alongside this README).
 
